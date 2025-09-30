@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Adeptus_Mechanicus_Litanys.MainPage"
+             Title="Литании Омниссии"
+             BackgroundColor="#1A1A1A"
+             ToolTipProperties.Text="+++ Литании во славу Омниссии +++">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="10">
+
+        <!-- Список кнопок литаний -->
+        <ScrollView Grid.Row="0" HeightRequest="350"
+                    BackgroundColor="#2A0000">
+            <VerticalStackLayout x:Name="LitanyButtonsStack"
+                                 Spacing="8"
+                                 Padding="10">
+
+                <Button Text="Литания Активации"
+                        BackgroundColor="#660000"
+                        TextColor="#FFD700"
+                        CornerRadius="8"
+                        ToolTipProperties.Text="+++ О, Омниссия, да пробудится механизм! +++"
+                        Clicked="OnLitanyClicked"
+                        />
+
+                <Button Text="Песнь Цепи"
+                        BackgroundColor="#660000"
+                        TextColor="#FFD700"
+                        CornerRadius="8"
+                        ToolTipProperties.Text="+++ Да не прервётся цепь, питающая святой двигатель +++"
+                        Clicked="OnLitanyClicked"/>
+
+                <Button Text="Благословение Зубчатого Колеса"
+                        BackgroundColor="#660000"
+                        TextColor="#FFD700"
+                        CornerRadius="8"
+                        ToolTipProperties.Text="+++ Пусть каждое колесо вращается во славу Омниссии +++"
+                        Clicked="OnLitanyClicked"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Текстовое поле -->
+        <ScrollView Grid.Row="1" Padding="10" BackgroundColor="#0D0D0D">
+            <Label x:Name="LitanyText"
+                   Text="+++ Загрузка данных литании... Литания запуска... +++"
+                   FontSize="16"
+                   TextColor="#CCCCCC"
+                   LineBreakMode="WordWrap"/>
+        </ScrollView>
+
+        <!-- Системные кнопки -->
+        <HorizontalStackLayout Grid.Row="2"
+                               Padding="10"
+                               Spacing="15"
+                               HorizontalOptions="Center">
+
+            <Button Text="Инвокация Машины"
+                    BackgroundColor="#003300"
+                    TextColor="#66FF66"
+                    CornerRadius="8"
+                    ToolTipProperties.Text="+++ Обнови список литаний, очисти память, во славу Омниссии +++"
+                    Clicked="OnRefreshClicked"
+                    x:Name="LActivation"/>
+
+            <Button Text="Бенедикция Перезапуска"
+                    BackgroundColor="#333333"
+                    TextColor="#FF3333"
+                    CornerRadius="8"
+                    ToolTipProperties.Text="+++ Сброс, очищение, новое начало — да благословит Омниссия +++"
+                    Clicked="OnClearClicked"
+                    x:Name="LRefresh"/>
+
+            <Button Text="Хвала Омниссии"
+                    BackgroundColor="#990000"
+                    TextColor="#FFD700"
+                    CornerRadius="8"
+                    ToolTipProperties.Text="+++ Случайная литания во славу Творца-Машины +++"
+                    Clicked="OnRandomClicked"
+                    x:Name="LRandom"/>
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>
