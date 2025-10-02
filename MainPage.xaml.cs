@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Plugin.Maui.Audio;
+using Renci.SshNet;
 
 namespace Adeptus_Mechanicus_Litanys
 {
@@ -102,9 +103,21 @@ namespace Adeptus_Mechanicus_Litanys
 
         private void OnRefreshClicked(object sender, EventArgs e)
         {
+
+            PlayLitanyAsync("OLitanies/Литания Благого Воззвания к Серверу.mp3");
+
+            string host = "bakasenpai.ru";       // IP VPS
+            int port = 22;
+            string username = "litany";
+            string password = "1234";
+            string remotePath = "litanies";
+            string localPath = Path.Combine(AppContext.BaseDirectory, "Litanies");
+
+            LitanySync.SyncLitanies(host, port, username, password, remotePath, localPath);
             // Здесь в будущем: перечитать папку с литаниями
             LoadLitanyButtons();
-            DisplayAlert("Omnissiah", "Litany list refreshed.", "Ave!");
+            DisplayAlert("Omnissiah", "Список литаний был обновлён.", "Ave!");
+            StopLitany();
         }
 
         private void OnClearClicked(object sender, EventArgs e)
@@ -180,6 +193,57 @@ namespace Adeptus_Mechanicus_Litanys
             base.OnDisappearing();
             // Это выполняется при закрытии окна (страницы)
             StopLitany(); // останавливаем звук
+        }
+
+        public static class LitanySync
+        {
+            /// <summary>
+            /// Синхронизация литаний с сервера по SFTP
+            /// </summary>
+            /// <param name="host">IP или домен сервера</param>
+            /// <param name="port">Порт (обычно 22)</param>
+            /// <param name="username">Пользователь SFTP</param>
+            /// <param name="password">Пароль</param>
+            /// <param name="remotePath">Папка на сервере (например "litanies")</param>
+            /// <param name="localPath">Локальная папка, куда скачивать</param>
+            public static void SyncLitanies(string host, int port, string username, string password,
+                                            string remotePath, string localPath)
+            {
+                if (!Directory.Exists(localPath))
+                    Directory.CreateDirectory(localPath);
+
+                using var sftp = new SftpClient(host, port, username, password);
+                sftp.Connect();
+
+                // Получаем список файлов на сервере
+                var files = sftp.ListDirectory(remotePath);
+
+                foreach (var file in files)
+                {
+                    if (file.IsDirectory || file.IsSymbolicLink) continue; // пропускаем папки
+                    if (!(file.Name.EndsWith(".mp3") || file.Name.EndsWith(".txt"))) continue; // только литании
+
+                    string localFile = Path.Combine(localPath, file.Name);
+
+                    bool needDownload = true;
+
+                    if (File.Exists(localFile))
+                    {
+                        long localSize = new FileInfo(localFile).Length;
+                        if (localSize == file.Attributes.Size)
+                            needDownload = false; // совпадает, пропускаем
+                    }
+
+                    if (needDownload)
+                    {
+                        using var fs = File.Open(localFile, FileMode.Create, FileAccess.Write);
+                        sftp.DownloadFile(file.FullName, fs);
+                        Console.WriteLine($"[SYNC] Обновлён: {file.Name}");
+                    }
+                }
+
+                sftp.Disconnect();
+            }
         }
     }
 }
